@@ -1,0 +1,62 @@
+#!/bin/sh
+
+#
+# First we clean up the namespace
+# 
+#
+rm -f adjname
+cat >>adjname <<\_ACEOF
+#!/bin/sh
+COUNT=1
+cd $4
+for each in *.$1
+do 
+if test -f $each 
+then mv $each $2_$COUNT.$3 
+fi
+COUNT=`expr $COUNT + 1`
+done
+_ACEOF
+chmod +x adjname
+
+#
+# Master Makefile generation
+# Target Makefile installation
+#
+rm -f Makefile
+cat >>Makefile <<\_ACEOF
+#
+# This is generated Makefile DO NOT EDIT
+#
+EXEC = $(shell basename `pwd`)
+SUBDIRS =
+_ACEOF
+
+for each in * 
+do if test -d $each 
+	then cp Makefile.in $each/Makefile
+	echo "SUBDIRS +=$each" >> Makefile
+fi
+done
+
+cat >>Makefile <<\_ACEOF
+all:
+	for n in $(SUBDIRS); do ./adjname JPG Photo jpg $$n ; done
+	for n in $(SUBDIRS); do ./adjname MOV Video mov $$n ; done
+	for n in $(SUBDIRS); do $(MAKE) -C $$n || exit 1; done
+
+install:
+	for n in $(SUBDIRS); do $(MAKE) -C $$n install; done
+	sudo bbgallery -T oldstyle -M -t $(EXEC)
+
+clean:
+	for n in $(SUBDIRS); do $(MAKE) -C $$n clean; done
+
+mrproper:
+	for n in $(SUBDIRS); do $(MAKE) -C $$n mrproper; done
+	rm -rf *.png *.css *.html
+	rm -f subdir_file .bbgallery
+	rm -f Makefile adjname
+	
+_ACEOF
+

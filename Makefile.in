@@ -1,0 +1,43 @@
+EXEC = $(shell basename `pwd`)
+
+all: .project
+
+movies := $(patsubst %.mov,%.flv,$(wildcard *.mov))
+html := $(patsubst %.flv.jpg,%.htm,$(wildcard *.flv.jpg))
+
+%.flv : %.mov
+	ffmpeg -i $< -ar 44100 -ab 9600 $@
+	ffmpeg -i $< -f mjpeg -t 0.001 $@.jpg
+
+.gallery:
+	cd ../ ; do bbgallery -I -L -v -t $(EXEC) -d $(EXEC)
+	touch .gallery
+
+#
+# First we render video file into flash format & generate a .jpg image off the first frame
+# Seconde we generate the photo gallery for all jpg in the directory including the one for the video
+# Third, we highjack the gallery html {from the 1st video frame} file and point it to a generated html file
+# That last step need to be into a separate step for makefile automatic rules {make install}
+.project: $(movies) .gallery
+	touch .project
+
+%.htm : %.flv.jpg
+	rm $<
+	echo "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\"><HTML><HEAD><LINK REL=\"stylesheet\" type=\"text/css\" HREF=\"newstyle.css\"> " > $<.htm
+	echo "<meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\"><script type=\"text/javascript\" src=\"/bin/flowplayer-3.1.4.min.js\"></script> " >>$<.htm
+	echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"/bin/style.css\"></HEAD><BODY> ">>$<.htm
+	echo "<TD ALIGN=\"CENTER\"><A HREF=\"$*.flv\" style=\"display:block;width:520px;height:330px\" id=\"player\"> </A> ">>$<.htm
+	echo "<script> flowplayer(\"player\", \"/bin/flowplayer-3.1.5.swf\", { clip:  { autoPlay: false, autoBuffering: true }}); </script></TD></BODY></HTML> ">>$<.htm
+
+	find . -name *.flv.html -exec sed -i 's/HREF="..\/$<"/HREF="..\/$<.htm"/g' {} \;
+	find . -name *.flv.html -exec sed -i 's/$(EXEC): $*.flv<P>/$(EXEC): ***VIDEO*** $*.flv<P>/g' {} \;
+
+install: $(html)
+
+
+clean:
+	rm -f .project 
+
+mrproper:
+	rm -rf scaled/ thumbs/ html/ .bb* *.flv *.flv.jpg *.htm*  .gallery Makefile
+

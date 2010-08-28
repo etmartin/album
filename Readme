@@ -1,0 +1,32 @@
+Install
+~~~~~~~
+sudo apt-get install ffmpeg
+sudo apt-get install libhtml-template-perl
+sudo apt-get install apache2
+
+cd ./bin
+Expand and Install bbgallery-1.2.0.tar.bz2
+mkdir /var/www/bin
+cp ./flash/*  
+Create /var/www/bin
+cp flash/* /var/www/bin/
+
+
+Run it
+~~~~~~
+Create a root album directory under /var/www/'root album'
+
+Under the root album, create chapter album
+/var/www/ 'root album' / 'chapter album'
+
+Place the appropriate photo / video under 'chapter album'
+
+cp configure Makefile.in to /var/www/'root album'
+
+cd /var/www/'root album'
+./configure
+make
+make install
+
+http://127.0.0.1/'root album'/
+
