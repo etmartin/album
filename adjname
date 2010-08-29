@@ -1,0 +1,10 @@
+#!/bin/sh
+COUNT=1
+cd $4
+for each in *.$1
+do 
+if test -f $each 
+then mv $each $2_$COUNT.$3 
+fi
+COUNT=`expr $COUNT + 1`
+done

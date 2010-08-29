@@ -1,30 +1,19 @@
 #!/bin/sh
 
 #
-# First we clean up the namespace
-# 
+# Target Makefile generation
+# 'cp Makefile.in under each directory'
 #
-rm -f adjname
-cat >>adjname <<\_ACEOF
-#!/bin/sh
-COUNT=1
-cd $4
-for each in *.$1
-do 
-if test -f $each 
-then mv $each $2_$COUNT.$3 
+for each in * 
+do if test -d $each 
+	then cp Makefile.in $each/Makefile
 fi
-COUNT=`expr $COUNT + 1`
 done
-_ACEOF
-chmod +x adjname
 
 #
 # Master Makefile generation
-# Target Makefile installation
 #
-rm -f Makefile
-cat >>Makefile <<\_ACEOF
+cat >Makefile <<\_ACEOF
 #
 # This is generated Makefile DO NOT EDIT
 #
@@ -34,8 +23,7 @@ _ACEOF
 
 for each in * 
 do if test -d $each 
-	then cp Makefile.in $each/Makefile
-	echo "SUBDIRS +=$each" >> Makefile
+	then echo "SUBDIRS +=$each" >> Makefile
 fi
 done
 
@@ -56,7 +44,7 @@ mrproper:
 	for n in $(SUBDIRS); do $(MAKE) -C $$n mrproper; done
 	rm -rf *.png *.css *.html
 	rm -f subdir_file .bbgallery
-	rm -f Makefile adjname
+	rm -f Makefile 
 	
 _ACEOF
 
