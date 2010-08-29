@@ -11,22 +11,24 @@ cp ./flash/*
 Create /var/www/bin
 cp flash/* /var/www/bin/
 
-
-Run it
-~~~~~~
+Generate HTML files
+~~~~~~~~~~~~~~~~~~~
 Create a root album directory under /var/www/'root album'
 
 Under the root album, create chapter album
 /var/www/ 'root album' / 'chapter album'
 
-Place the appropriate photo / video under 'chapter album'
+Place photo and/or video under 'chapter album'
 
 cp configure Makefile.in to /var/www/'root album'
 
 cd /var/www/'root album'
+
+# Web pages are generated here
 ./configure
 make
 make install
 
+# From the browser...
 http://127.0.0.1/'root album'/
 
